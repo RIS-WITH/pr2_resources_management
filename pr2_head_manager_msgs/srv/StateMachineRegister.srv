@@ -1,0 +1,4 @@
+resource_management_msgs/StateMachineHeader header
+StateMachine state_machine
+---
+uint32 id
