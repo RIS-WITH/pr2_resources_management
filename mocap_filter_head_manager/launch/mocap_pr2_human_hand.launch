@@ -1,0 +1,13 @@
+<launch>
+  <remap from="/head_manager_output" to="/pr2_head_manager/human_hand_monitoring/pr2_head_manager_msgs_Point"/>
+  <remap from="/optitrack_input_topic" to="/optitrack/bodies/Glove_1"/>
+  <node name="mocap_filter_human_hand" pkg="mocap_filter_head_manager" type="mocap_filter" output="screen">
+    <rosparam>
+        publish_period: 0.1
+        no_data_timeout: 2.0
+        standard_priority_distance: 1.0
+        high_priority_distance: 0.5
+        distance_frames: [base_footprint, base_link, table_1]
+    </rosparam>
+  </node>
+</launch>
