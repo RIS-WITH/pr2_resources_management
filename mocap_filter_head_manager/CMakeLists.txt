@@ -10,6 +10,9 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   resource_management_msgs
   pr2_head_manager_msgs
+  tf2_geometry_msgs
+  tf2_ros
+  tf2
   geometry_msgs
   roscpp
 )
