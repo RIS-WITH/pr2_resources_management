@@ -3,10 +3,10 @@
   <remap from="/optitrack_input_topic" to="/optitrack/bodies/Helmet_2"/>
   <node name="mocap_filter_human_head" pkg="mocap_filter_head_manager" type="mocap_filter" output="screen">
     <rosparam>
-      publish_period: 0.1
+      publish_period: 0.5
       no_data_timeout: 2.0
       standard_priority_distance: 3.0
-      high_priority_distance: 1.0
+      high_priority_distance: 1.5
       distance_frames: [base_footprint]
     </rosparam>
   </node>

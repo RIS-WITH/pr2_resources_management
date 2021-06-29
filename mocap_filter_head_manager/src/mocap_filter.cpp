@@ -10,7 +10,7 @@ MocapFilter::MocapFilter(ros::NodeHandlePtr& nh): nh_(nh){
     updateParams();
     tfListener_ = std::unique_ptr<tf2_ros::TransformListener>(new tf2_ros::TransformListener(tfBuffer_));
     headManagerPub_ = nh_->advertise<pr2_head_manager_msgs::Point>("/head_manager_output", 1);
-    optitrackSub_ = nh_->subscribe("/optitrack_input_topic", 1, &MocapFilter::onNewPoint, this);
+    optitrackSub_ = nh_->subscribe("/optitrack_input_topic", 10, &MocapFilter::onNewPoint, this);
     pubTimer_ = nh_->createTimer(ros::Duration(params_.publishPeriod), &MocapFilter::publishPoint, this);
 }
 
@@ -44,11 +44,11 @@ void MocapFilter::publishPoint(const ros::TimerEvent& e){
 
     double minDistSq = getMinSqDistancesLastPointToFrames();
     if (minDistSq <= params_.highDistSq){
-        pt.priority.value = pt.priority.HIGH;
-    }else if (minDistSq <= params_.standardDistSq){
         pt.priority.value = pt.priority.STANDARD;
-    }else{
+    }else if (minDistSq <= params_.standardDistSq){
         pt.priority.value = pt.priority.LOW;
+    }else{
+        pt.priority.value = pt.priority.VOID;
     }
     pt.data = lastPoint_;
     headManagerPub_.publish(pt);
