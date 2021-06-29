@@ -8,6 +8,8 @@
 
 #include <resource_management/ReactiveInputs.h>
 #include <resource_management/ResourceManager.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include <thread>
 
@@ -47,12 +49,14 @@ public:
 	ROS_INFO_STREAM(NODE_NAME << ": Waiting for head controller");
 	point_head_client->waitForServer();
 	ROS_INFO_STREAM(NODE_NAME << ": Head controller found");
-    	watchdog = nh->createTimer(ros::Duration(0.05), &Pr2HeadManager::onWatchDog, this);
+      tfListener = new tf2_ros::TransformListener(tfBuffer);
+    	watchdog = nh->createTimer(ros::Duration(0.1), &Pr2HeadManager::onWatchDog, this);
     	ROS_INFO_STREAM(NODE_NAME << ": Online.");
     }
 
   ~Pr2HeadManager(){
     delete point_head_client;
+    delete tfListener;
   }
 
 private:
@@ -72,7 +76,8 @@ private:
 
     actionlib::SimpleActionClient< pr2_controllers_msgs::JointTrajectoryAction >* point_head_client;
     ros::Subscriber joint_state_sub;
-    tf::TransformListener tfl;
+    tf2_ros::Buffer tfBuffer;
+    tf2_ros::TransformListener* tfListener;
     bool _is_command_running;
     ros::Timer watchdog;
     double currentTilt, currentPan;

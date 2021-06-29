@@ -91,22 +91,22 @@ void Pr2HeadManager::publishPointMsg(geometry_msgs::PointStamped msg, bool is_ne
     // TODO: Make IK to check if the reference frame of the point has moved
 
     tf::Point target_in_root;
-    int ret = 0;
+    geometry_msgs::TransformStamped torso2frame;
     try
     {
         std::string error_msg;
-        ret = tfl.waitForTransform("torso_lift_link", msg.header.frame_id, msg.header.stamp,
-                                        ros::Duration(5.0), ros::Duration(0.01), &error_msg);
-
-        geometry_msgs::PointStamped target_in_root_msg;
-        tfl.transformPoint("torso_lift_link", msg, target_in_root_msg);
-        tf::pointMsgToTF(target_in_root_msg.point, target_in_root);
+        msg.header.stamp = ros::Time(0);
+        torso2frame = tfBuffer.lookupTransform("torso_lift_link", msg.header.frame_id, ros::Time(0));
     }
     catch(const tf::TransformException &ex)
     {
-        ROS_ERROR("Transform failure (%d): %s", ret, ex.what());
+        ROS_ERROR("Transform failure: %s", ex.what());
+        ROS_ERROR("Timestamp %f", msg.header.stamp.toSec());
         return;
     }
+    geometry_msgs::PointStamped target_in_root_msg;
+    tf2::doTransform(msg, target_in_root_msg, torso2frame);
+    tf::pointMsgToTF(target_in_root_msg.point, target_in_root);
     target_in_root -= {-0.01707, 0, 0.38145};
     double pitch = -asin(target_in_root.getZ() / target_in_root.length());
     double yaw = atan2(target_in_root.getY(), target_in_root.getX());

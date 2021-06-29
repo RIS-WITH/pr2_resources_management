@@ -9,7 +9,8 @@ find_package(catkin REQUIRED
   resource_management
   geometry_msgs pr2_head_manager_msgs
   pluginlib
-  tf
+  tf2_ros
+  tf2_geometry_msgs
 )
 
 catkin_package(
