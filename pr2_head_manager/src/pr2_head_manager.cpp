@@ -107,6 +107,7 @@ void Pr2HeadManager::publishPointMsg(geometry_msgs::PointStamped msg, bool is_ne
     geometry_msgs::PointStamped target_in_root_msg;
     tf2::doTransform(msg, target_in_root_msg, torso2frame);
     tf::pointMsgToTF(target_in_root_msg.point, target_in_root);
+    target_in_root.setZ(target_in_root.getZ() - 0.3);
     target_in_root -= {-0.01707, 0, 0.38145};
     double pitch = -asin(target_in_root.getZ() / target_in_root.length());
     double yaw = atan2(target_in_root.getY(), target_in_root.getX());
