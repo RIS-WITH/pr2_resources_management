@@ -56,8 +56,6 @@ void onNewLidarScan(const sensor_msgs::LaserScan &msg)
             }
             if (max_motion >= distance_threshold)
             {
-                std::cout << "max_motion = " << max_motion << std::endl;
-                std::cout << "index = " << index_max << " / " << msg.ranges.size() << std::endl;
                 pr2_head_manager_msgs::Point pt;
                 float angle = msg.angle_min + index_max * msg.angle_increment;
                 pt.data.header.frame_id = msg.header.frame_id;
@@ -88,6 +86,8 @@ int main(int argc, char** argv)
 
     point_head_pub = nh->advertise<pr2_head_manager_msgs::Point>("/pr2_head_manager/proximity/pr2_head_manager_msgs_Point", 10, true);
     ros::Subscriber lidar_sub = nh->subscribe("/base_scan", 1, onNewLidarScan);
+
+    std::cout << "Proximity sensing is running" << std::endl;
 
     ros::spin();
     return 0;
