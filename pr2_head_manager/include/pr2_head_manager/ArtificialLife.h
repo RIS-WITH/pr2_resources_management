@@ -21,6 +21,11 @@ private:
   std::normal_distribution<double> normal_distribution;
   std::chrono::time_point<std::chrono::system_clock> last_moved_time;
   int next_duration;
+
+  double pitch;
+  double yaw;
+
+  double getNearValue(double previous_value, double max_delta);
 };
 
 } // namespace pr2_head_manager
