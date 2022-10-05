@@ -42,15 +42,15 @@ public:
         // Remove if your do not need artificial life
         _artificialLife = (std::make_shared<pr2_head_manager::ArtificialLife>(_artificialLifeBuffer));
 
-	point_head_client = new actionlib::SimpleActionClient<pr2_controllers_msgs::JointTrajectoryAction>(
+	    point_head_client = new actionlib::SimpleActionClient<pr2_controllers_msgs::JointTrajectoryAction>(
         "/head_traj_controller/joint_trajectory_action", true);
-    	joint_state_sub = nh->subscribe("/joint_states", 1, &Pr2HeadManager::onJointState, this);
+    	joint_state_sub = _nh->subscribe("/joint_states", 1, &Pr2HeadManager::onJointState, this);
 
-	ROS_INFO_STREAM(NODE_NAME << ": Waiting for head controller");
-	point_head_client->waitForServer();
-	ROS_INFO_STREAM(NODE_NAME << ": Head controller found");
+      ROS_INFO_STREAM(NODE_NAME << ": Waiting for head controller");
+      point_head_client->waitForServer();
+      ROS_INFO_STREAM(NODE_NAME << ": Head controller found");
       tfListener = new tf2_ros::TransformListener(tfBuffer);
-    	watchdog = nh->createTimer(ros::Duration(0.1), &Pr2HeadManager::onWatchDog, this);
+    	watchdog = _nh->createTimer(ros::Duration(0.1), &Pr2HeadManager::onWatchDog, this);
     	ROS_INFO_STREAM(NODE_NAME << ": Online.");
     }
 

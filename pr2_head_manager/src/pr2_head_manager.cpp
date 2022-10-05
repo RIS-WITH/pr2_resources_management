@@ -1,6 +1,5 @@
 #include "pr2_head_manager/pr2_head_manager.h"
 
-
 std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> Pr2HeadManager::stateFromMsg(const pr2_head_manager_msgs::StateMachineRegister::Request &msg)
 {
     std::map<std::string,std::shared_ptr<resource_management::MessageAbstraction>> states;
@@ -33,45 +32,38 @@ Pr2HeadManager::transitionFromMsg(const pr2_head_manager_msgs::StateMachine &msg
 {
     std::vector<std::tuple<std::string,std::string,resource_management_msgs::EndCondition>> transitions;
 
-    for(auto x : msg.states_Point){
-        for(auto t : x.header.transitions){
-            transitions.push_back(
-                        std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
-                            std::string(x.header.id),
-                            std::string(t.next_state),
-                            resource_management_msgs::EndCondition(t.end_condition)));
-        }
-    }
+    for(auto x : msg.states_Point)
+        std::transform(x.header.transitions.begin(), x.header.transitions.end(),
+                      std::back_inserter(transitions),
+                      [x](auto& t){return std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
+                                                          std::string(x.header.id),
+                                                          std::string(t.next_state),
+                                                          resource_management_msgs::EndCondition(t.end_condition));});
 
-    for(auto x : msg.states_PitchYaw){
-        for(auto t : x.header.transitions){
-            transitions.push_back(
-                        std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
-                            std::string(x.header.id),
-                            std::string(t.next_state),
-                            resource_management_msgs::EndCondition(t.end_condition)));
-        }
-    }
+    for(auto x : msg.states_PitchYaw)
+        std::transform(x.header.transitions.begin(), x.header.transitions.end(),
+                      std::back_inserter(transitions),
+                      [x](auto& t){return std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
+                                                          std::string(x.header.id),
+                                                          std::string(t.next_state),
+                                                          resource_management_msgs::EndCondition(t.end_condition));});
 
-    for(auto x : msg.states_PrioritizedPitch){
-        for(auto t : x.header.transitions){
-            transitions.push_back(
-                        std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
-                            std::string(x.header.id),
-                            std::string(t.next_state),
-                            resource_management_msgs::EndCondition(t.end_condition)));
-        }
-    }
+    for(auto x : msg.states_PrioritizedPitch)
+        std::transform(x.header.transitions.begin(), x.header.transitions.end(),
+                      std::back_inserter(transitions),
+                      [x](auto& t){return std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
+                                                          std::string(x.header.id),
+                                                          std::string(t.next_state),
+                                                          resource_management_msgs::EndCondition(t.end_condition));});
 
-    for(auto x : msg.states_PrioritizedYaw){
-        for(auto t : x.header.transitions){
-            transitions.push_back(
-                        std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
-                            std::string(x.header.id),
-                            std::string(t.next_state),
-                            resource_management_msgs::EndCondition(t.end_condition)));
-        }
-    }
+    for(auto x : msg.states_PrioritizedYaw)
+        std::transform(x.header.transitions.begin(), x.header.transitions.end(),
+                      std::back_inserter(transitions),
+                      [x](auto& t){return std::make_tuple<std::string,std::string,resource_management_msgs::EndCondition>(
+                                                          std::string(x.header.id),
+                                                          std::string(t.next_state),
+                                                          resource_management_msgs::EndCondition(t.end_condition));});
+
     return transitions;
 }
 
@@ -94,7 +86,6 @@ void Pr2HeadManager::publishPointMsg(geometry_msgs::PointStamped msg, bool is_ne
     geometry_msgs::TransformStamped torso2frame;
     try
     {
-        std::string error_msg;
         msg.header.stamp = ros::Time(0);
         torso2frame = tfBuffer.lookupTransform("torso_lift_link", msg.header.frame_id, ros::Time(0));
     }
@@ -249,6 +240,7 @@ void Pr2HeadManager::checkGoalActive() {
 void Pr2HeadManager::onWatchDog(const ros::TimerEvent&) {
   checkGoalActive();
 }
+
 void Pr2HeadManager::onJointState(const sensor_msgs::JointStateConstPtr &msg) {
   bool tiltFound = false, panFound = false;
   for (size_t i=0; i < msg->name.size(); i++){
@@ -264,4 +256,3 @@ void Pr2HeadManager::onJointState(const sensor_msgs::JointStateConstPtr &msg) {
     }
   }
 }
-

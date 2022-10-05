@@ -24,7 +24,7 @@ struct Params{
 
 class MocapFilter{
     public:
-    MocapFilter(ros::NodeHandlePtr& nh);
+    explicit MocapFilter(ros::NodeHandlePtr& nh);
     ~MocapFilter();
 
     void onNewPoint(const optitrack_ros::or_pose_estimator_stateConstPtr& msg);
