@@ -229,7 +229,6 @@ void Pr2HeadManager::checkGoalActive() {
         if (head_state != actionlib::SimpleClientGoalState::ACTIVE){
             this->done();
             _is_command_running = false;
-            std::cout << "done" << std::endl;
         }
     }else{
         if (head_state == actionlib::SimpleClientGoalState::ACTIVE){

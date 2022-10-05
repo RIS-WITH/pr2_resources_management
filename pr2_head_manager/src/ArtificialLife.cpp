@@ -6,7 +6,7 @@ namespace pr2_head_manager {
 
 ArtificialLife::ArtificialLife(std::shared_ptr<resource_management::ReactiveBuffer> buffer) :
         resource_management::ArtificialLife(100 /* you can change the artficial life frame rate here*/, buffer),
-        poisson_distribution(5000), normal_distribution(0.0, 0.2)
+        poisson_distribution(3000), normal_distribution(0.0, 0.2)
 {
   // set an initial value in the artificial life buffer
   // if you do not do that that resource will not start in artificial life mode
@@ -36,6 +36,9 @@ ArtificialLife::ArtificialLife(std::shared_ptr<resource_management::ReactiveBuff
     auto wrapped_PitchYaw_data = std::make_shared<resource_management::MessageWrapper<pr2_head_manager_msgs::RawPitchYaw>>(data);
     wrapped_PitchYaw_data->setPriority(resource_management::low);
     _buffer->setData(wrapped_PitchYaw_data);
+
+    pitch = data.pitch;
+    yaw = data.yaw;
 }
 
 void ArtificialLife::init()
@@ -104,17 +107,33 @@ void ArtificialLife::inLoop()
   // _buffer->setData(wrapped_PrioritizedPitch_data);
   // _buffer->setData(wrapped_PrioritizedYaw_data);
     auto now = std::chrono::system_clock::now();
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - last_moved_time).count() >= next_duration) {
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - last_moved_time).count() >= next_duration)
+    {
         pr2_head_manager_msgs::RawPitchYaw data;
-        data.pitch = normal_distribution(generator);
-        data.yaw = normal_distribution(generator);
+        do {
+          data.pitch = getNearValue(pitch, 0.15);
+        } while(data.pitch < -0.1);
+        
+        data.yaw = getNearValue(yaw, 0.15);
         auto wrapped_PitchYaw_data = std::make_shared<resource_management::MessageWrapper<pr2_head_manager_msgs::RawPitchYaw>>(
                 data);
         wrapped_PitchYaw_data->setPriority(resource_management::low);
         _buffer->setData(wrapped_PitchYaw_data);
         last_moved_time = now;
         next_duration = poisson_distribution(generator);
+
+        pitch = data.pitch;
+        yaw = data.yaw;
     }
+}
+
+double ArtificialLife::getNearValue(double previous_value, double max_delta)
+{
+  double value = 0;
+  do {
+    value = normal_distribution(generator);
+  } while(std::abs(value - previous_value) > max_delta);
+  return value;
 }
 
 } // namespace pr2_head_manager
